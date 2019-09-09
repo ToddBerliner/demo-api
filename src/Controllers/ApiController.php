@@ -7,6 +7,11 @@ abstract class ApiController
     // All inheriting classes must implement the processRequest method
     abstract function processRequest();
 
+    /*
+     * NOTE: the client is responsible for checking the response status
+     * headers.
+     */
+
     public function itemResponse($item) {
         // 200 - OK
         http_response_code(200);
@@ -46,11 +51,16 @@ abstract class ApiController
         exit;
     }
 
-    public function unprocessableResponse() {
+    public function unprocessableResponse($errors) {
         // 422 - bad POST or PUT
         // Must include error messages so client
         // can alert user or highlight unacceptable
         // input.
+        http_response_code(422);
+        echo json_encode([
+            'errors' => $errors
+        ]);
+        exit;
     }
 
     public function notFoundResponse() {

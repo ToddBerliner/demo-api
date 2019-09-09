@@ -12,7 +12,6 @@ class ProductsTable {
     const SKU = 'sku';
     const ALT_SKU = 'alt_sku';
     const MERCHANT_ID = 'merchant_id';
-    const NAME = 'name';
     const DESCRIPTION = 'description';
     const UNIT_PRICE = 'unit_price';
     const WEIGHT = 'weight';
@@ -25,7 +24,6 @@ class ProductsTable {
         self::SKU,
         self::ALT_SKU,
         self::MERCHANT_ID,
-        self::NAME,
         self::DESCRIPTION,
         self::UNIT_PRICE,
         self::WEIGHT,
@@ -43,13 +41,13 @@ class ProductsTable {
     public function find($productId) {
         // Not all fields need to be included in response
         $fields = implode(',', self::PUBLIC_FIELDS);
-        $statement = <<<ENDQUERY
-SELECT 
-    $fields
-FROM 
-    products
-WHERE id = :productId
-ENDQUERY;
+        $statement = "
+            SELECT 
+                $fields
+            FROM 
+                products
+            WHERE id = :productId;
+        ";
 
         try {
             $statement = $this->db->prepare($statement);
@@ -67,27 +65,29 @@ ENDQUERY;
     public function findAll() {
         // Not all fields need to be included in response
         $fields = implode(',', self::PUBLIC_FIELDS);
-        $statement = <<<ENDQUERY
-SELECT 
-    $fields
-FROM 
-    products
-ENDQUERY;
+        $statement = "
+            SELECT 
+                $fields
+            FROM 
+                products
+        ";
 
         try {
             $statement = $this->db->prepare($statement);
-            $statement->execute(['productId' => $productId]);
+            $statement->execute();
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
             return $result;
         } catch (\PDOException $e) {
             // LOG or otherwise handle the error. For a simple
-            // find of a given productId, there's no real useful
+            // find of a the products, there's no real useful
             // error states to handle.
             return false;
         }
     }
 
-    public function createProduct($product) {}
+    public function createProduct($product) {
+        return false;
+    }
 
     public function updateProduct($product) {}
 
@@ -96,4 +96,10 @@ ENDQUERY;
     public function validateProduct($product) {
         return true;
     }
+
+    /*
+     * NOTE: Unit tests would cover the methods in this class. I'll
+     * implement unit tests for a representative sample of the
+     * specified field validations.
+     */
 }
