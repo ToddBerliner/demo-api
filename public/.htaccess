@@ -1,0 +1,7 @@
+# Simple routing - rewrite all URLs to allow
+# for dropping the ".php" extension
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)$ api.php [QSA,L]

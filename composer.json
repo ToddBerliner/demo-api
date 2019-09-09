@@ -1,0 +1,12 @@
+{
+  "name": "shipwire/api",
+  "description": "ShipWire coding challenge API by Todd Berliner",
+  "autoload": {
+    "psr-4": {
+      "Api\\": "src/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7"
+  }
+}
