@@ -59,11 +59,11 @@ class ProductsController extends ApiController {
          * or a 422, unprocessable, with an error message indicating the
          * unprocessable fields.
          */
-        $product = $this->Products->createProduct($productData);
-        if (isset($product['errors'])) {
-            $this->unprocessableResponse($product['errors']);
+        $result = $this->Products->createProduct($productData);
+        if (isset($result['errors'])) {
+            $this->unprocessableResponse($result['errors']);
         } else {
-            $this->createdResponse($product['id']);
+            $this->createdResponse($result['id']);
         }
     }
 
