@@ -18,7 +18,45 @@ Tests can be run from the project root with the command:
 
 The API expects calls to be made as follows:
 ```
-Get all products: /api/products
-Get a single product: /api/product/{$productId}
+Get all products(GET): /api/products
+Get a single product (GET): /api/products/<product_id>
+Create a product (POST): /api/products
+Update a product (PUT): /api/products/<product_id>
+Delete a product (DELETE): /api/products/<product_id>
 ```
-LEFT OFF HERE...
+
+> Expected Payload for a Product
+```
+For a PUT request, add the "id" property ("id": 1)
+{
+	"product": {
+		"sku": "helloworld",
+		"alt_sku": null,
+		"merchant_id": 1,
+		"description": "hello world!",
+		"unit_price": 1.255555555,
+		"weight": 25.0001,
+		"length": 12.2323,
+		"height": 23.1212,
+		"quantity": 1000
+	}
+}
+```
+
+> CURL Sample
+```
+curl -X POST \
+  http://localhost:2323/api/products \
+  -d '{
+	"product": {
+		"sku": "helloworld",
+		"alt_sku": null,
+		"merchant_id": 1,
+		"description": "hello world!",
+		"unit_price": 1.25,
+		"weight": 25.0001,
+		"length": 12.2323,
+		"height": 23.1212,
+		"quantity": 1000
+	}
+}'
