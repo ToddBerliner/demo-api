@@ -7,12 +7,12 @@ class ProductsController extends ApiController {
 
     private $requestMethod;
     private $productId;
-    private $Products;
+    private $ProductsTable;
 
     public function __construct($requestMethod, $productId) {
         $this->requestMethod = $requestMethod;
         $this->productId = $productId;
-        $this->Products = new ProductsTable();
+        $this->ProductsTable = new ProductsTable();
     }
 
     public function processRequest() {
@@ -28,8 +28,23 @@ class ProductsController extends ApiController {
                 break;
             case 'POST':
                 // Get the post data
-                $productData = json_decode(file_get_contents("php://input"), TRUE);
+                $postData = json_decode(file_get_contents("php://input"), TRUE);
+                if (!$postData) {
+                    $this->badRequestResponse();
+                }
+                $productData = $postData['product'];
                 $this->_createProduct($productData);
+                break;
+            case 'PUT':
+                $putData = json_decode(file_get_contents("php://input"), TRUE);
+                if (!$putData) {
+                    $this->badRequestResponse();
+                }
+                $productData = $putData['product'];
+                $this->_updateProduct($productData);
+                break;
+            case 'DELETE':
+                $this->_deleteProduct($this->productId);
                 break;
             default:
                 $this->notFoundResponse();
@@ -37,33 +52,11 @@ class ProductsController extends ApiController {
     }
 
     private function _getProduct($productId) {
-        $product = $this->Products->find($productId);
+        $product = $this->ProductsTable->find($productId);
         if (!$product) {
             $this->notFoundResponse();
         } else {
             $this->itemResponse($product);
-        }
-    }
-
-    private function _createProduct($productData) {
-        /*
-         * Requirements for creation of product:
-         * * product must validate, all required fields & field types/sizes
-         * * product should not already exist
-         * * sku and alt_sku, if provided, must be different
-         * * NOTE: merchant sku and alt_sku uniqueness will be enforced via database
-         * *    to prevent need for additional query to check for existing sku/alt_sku
-         * *    for merchant
-         *
-         * Response will either be a 201, created, with Location header set
-         * or a 422, unprocessable, with an error message indicating the
-         * unprocessable fields.
-         */
-        $result = $this->Products->createProduct($productData);
-        if (isset($result['errors'])) {
-            $this->unprocessableResponse($result['errors']);
-        } else {
-            $this->createdResponse($result['id']);
         }
     }
 
@@ -72,8 +65,54 @@ class ProductsController extends ApiController {
         // to support paging for brevity. Ideally, paging would
         // be handled and a proper response would include the following
         // keys: offset, limit, prev, next, href and total.
-        $items = $this->Products->findAll();
+        $items = $this->ProductsTable->findAll();
         $this->listResponse($items);
     }
 
+    private function _createProduct($productData) {
+        /*
+         * Response will either be a 201, created, with Location header set
+         * or a 422, unprocessable, with an error message indicating the
+         * unprocessable fields.
+         */
+        $result = $this->ProductsTable->createProduct($productData);
+        if (isset($result['errors'])) {
+            $this->unprocessableResponse($result['errors']);
+        } else {
+            $this->createdResponse($result[ProductsTable::ID]);
+        }
+    }
+
+    private function _updateProduct($productData) {
+        /*
+         * Response will either be 204, no content, or
+         * 422, unprocessable, with an error message indicating
+         * the unprocessable fields.
+         */
+        $result = $this->ProductsTable->updateProduct($productData);
+        if (isset($result['errors'])) {
+            $this->unprocessableResponse($result['errors']);
+        } else {
+            $this->noContentResponse();
+        }
+    }
+
+    private function _deleteProduct($productId) {
+        /*
+         * Response will either be 204, no content, or
+         * 422, unprocessable, with an error message indicating
+         * the reason.
+         */
+        $result = $this->ProductsTable->deleteProduct($productId);
+        if (isset($result['errors'])) {
+            $this->unprocessableResponse($result['errors']);
+        } else {
+            $this->noContentResponse();
+        }
+    }
+
 }
+/*
+ * TODO: refactor to include a Model/Product class instead of just
+ * lumping them together in the ProducsTable class.
+ */

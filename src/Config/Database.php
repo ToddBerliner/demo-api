@@ -11,7 +11,10 @@ class Database
     private $password = "tberliner";
     private $database = "shipwire";
 
-    public function __construct() {
+    public function __construct($test = false) {
+        if ($test) {
+            $this->database = "shipwire_test";
+        }
         try {
                 $this->dbConnection = new \PDO(
                     "mysql:host=$this->host;port=$this->port;charset=utf8mb4;dbname=$this->database",

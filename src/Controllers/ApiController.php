@@ -51,8 +51,14 @@ abstract class ApiController
         exit;
     }
 
+    public function badRequestResponse() {
+        // 400 - malformed or bad request
+        http_response_code(400);
+        exit;
+    }
+
     public function unprocessableResponse($errors) {
-        // 422 - bad POST or PUT
+        // 422 - well formed but unprocessable POST or PUT
         // Must include error messages so client
         // can alert user or highlight unacceptable
         // input.

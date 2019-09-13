@@ -44,12 +44,17 @@ class ProductsTable {
         self::HEIGHT
     ];
 
-    public function __construct() {
+    public function __construct($test = false) {
         // Get our database connection
-        $db = new Database();
+        $db = new Database($test);
         $this->db = $db->getDbConnection();
     }
 
+    /**
+     * Find a product
+     * @param int $productId
+     * @return array|bool The found product, an array with errors specified, or false if not found
+     */
     public function find($productId) {
         // Not all fields need to be included in response
         $fields = implode(',', self::PUBLIC_FIELDS);
@@ -70,7 +75,7 @@ class ProductsTable {
             // LOG or otherwise handle the error. For a simple
             // find of a given productId, there's no real useful
             // error states to handle.
-            return false;
+            return ['error' => ['db' => 'error getting product']];
         }
     }
 
@@ -82,6 +87,8 @@ class ProductsTable {
                 $fields
             FROM 
                 products
+            WHERE
+                is_active = 1
         ";
 
         try {
@@ -93,10 +100,18 @@ class ProductsTable {
             // LOG or otherwise handle the error. For a simple
             // find of a the products, there's no real useful
             // error states to handle.
-            return false;
+            return ['error' => ['db' => 'error getting all products']];
         }
-    }
+    } // returns Product instances
 
+    /**
+     * Create a product
+     * @param array $product The product data
+     * @return array The created product with id or an array with errors specified
+     *
+     * NOTE: per refactor note in ProductsController, this method really
+     * should be receiving and returning a Product instance
+     */
     public function createProduct($product) {
 
         // create specific errors
@@ -138,21 +153,35 @@ ENDQUERY;
                 $product[self::ID] = $this->db->lastInsertId();
                 return $product;
             } else {
-                return false;
+                return ['error' => ['db' => $this->db->errorCode()]];
             }
         } catch (\PDOException $e) {
             return ['errors' => ['db' => $e->getMessage()]];
         }
     }
 
+    /**
+     * Update a product
+     * @param array $product The product data
+     * @return array The updated product or an array with errors specified
+     *
+     * NOTE: per refactor note in ProductsController, this method really
+     * should be receiving and returning a Product instance
+     */
     public function updateProduct($product) {
+
+        // ensure product contains product id
+        if (!isset($product[self::ID])) {
+            return ['errors' => 'missing product id, did you mean to POST?'];
+        }
+
         // validate updated fields
         $errors = $this->getValidationErrors($product);
         if (!empty($errors)) {
             return ['errors' => $errors];
         }
 
-        // get dirty fields to update
+        // get dirty fields to update (checks for non-existent product)
         $dirtyFields = $this->_getDirtyFields($product);
         if (!empty($errors)) {
             return ['errors' => $errors];
@@ -178,14 +207,22 @@ ENDQUERY;
             if ($statement->execute($values)) {
                 return $product;
             } else {
-                return false;
-            };
+                return ['error' => ['db' => $this->db->errorCode()]];
+            }
         } catch (\PDOException $e) {
             return ['errors' => ['db' => $e->getMessage()]];
         }
     }
 
+    /**
+     * Delete a product
+     * @param int $productId The product id to delete
+     * @return array The deleted product or an array with errors specified
+     */
     public function deleteProduct($productId) {
+        if (!isset($productId)) {
+            return ['errors' => 'no product specified'];
+        }
         $product = $this->find($productId);
         if (!$product) {
             return ['errors' => 'product does not exist'];
@@ -193,7 +230,7 @@ ENDQUERY;
         $statement = "
             UPDATE products
             SET is_active = 0
-            WHERE product_id = :productId
+            WHERE id = :productId
         ";
         try {
             $statement = $this->db->prepare($statement);
@@ -201,7 +238,7 @@ ENDQUERY;
                 $product[self::IS_ACTIVE] = 0;
                 return $product;
             } else {
-                return false;
+                return ['error' => ['db' => $this->db->errorCode()]];
             }
         } catch (\PDOException $e) {
             return ['errors' => ['db' => $e->getMessage()]];
@@ -217,6 +254,7 @@ ENDQUERY;
         $dirtyFields = [];
         foreach($existingProduct as $field => $value) {
             if (in_array($field, self::PUBLIC_FIELDS)
+                && isset($product[$field])
                 && $product[$field] != $value) {
                 $dirtyFields[] = $field;
             }
@@ -303,16 +341,14 @@ ENDQUERY;
     }
 
     public function validateUniqueSkus($product, $field = 'sku') {
-        // NOTE: I expected to be able to detect unique key constraint
-        // failures, but got error codes that weren't what i expected, so
-        // I moved on. I've most frequently done unique key checks in code
-        // anyway since those kind of requirements could change.
         $statement = "
             SELECT * 
             FROM
                 products
             WHERE 
-                merchant_id = :merchantId AND $field = :value
+                merchant_id = :merchantId
+                AND $field = :value
+                AND is_active = 1
         ";
         $values = [
             'merchantId' => $product[self::MERCHANT_ID],
@@ -336,8 +372,8 @@ ENDQUERY;
         }
     }
 
-    // NOTE: these could be broken into two validations for uber specific
-    // error messaging
+    // NOTE: the validations below could be broken into two validations for
+    // uber specific error messaging
     public static function isAlphaNumMaxChars($string, $maxChars) {
         $pattern = '/^([a-zA-Z0-9_-]){1,' . $maxChars . '}$/';
         return preg_match($pattern, $string) === 1;

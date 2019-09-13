@@ -13,7 +13,7 @@ class ProductsTableTest extends TestCase
     public function setUp() {
 
         parent::setUp();
-        $database = new Database();
+        $database = new Database(true);
         $this->db = $database->getDbConnection();
 
         // create clean test data
@@ -23,12 +23,13 @@ INSERT INTO products
 VALUES
     (1000, '1234567890abcdef', null, 99, 'Test product for unit tests.', 1.99, 0.1234, 1.1111, 1.1111, 1, 10),
     (1001, '2234567890abcdef', null, 99, 'Test product for unit tests.', 1.99, 0.1234, 1.1111, 1.1111, 1, 10),
-    (1002, '3234567890abcdef', '4234567890abcdef', 99, 'Test product for unit tests.', 1.99, 0.1234, 1.1111, 1.1111, 1, 10)
+    (1002, '3234567890abcdef', '4234567890abcdef', 99, 'Test product for unit tests.', 1.99, 0.1234, 1.1111, 1.1111, 1, 10),
+    (1003, 'inactive', 'altinactive', 99, 'Test product for unit tests.', 1.99, 0.1234, 1.1111, 1.1111, 0, 10)
 ENDQUERY;
         $statement = $this->db->prepare($statement);
         $statement->execute();
 
-        $this->ProductsTable = new ProductsTable();
+        $this->ProductsTable = new ProductsTable(true);
     }
 
     public function testFindAll() {
@@ -52,8 +53,7 @@ ENDQUERY;
             ProductsTable::LENGTH => 123,
             ProductsTable::HEIGHT => 123
         ];
-        $ProductsTable = new ProductsTable();
-        $result = $ProductsTable->createProduct($product);
+        $result = $this->ProductsTable->createProduct($product);
         $this->assertArrayHasKey('errors', $result);
         $this->assertEquals(1, count($result['errors']));
         $this->assertEquals([
@@ -71,13 +71,26 @@ ENDQUERY;
             ProductsTable::LENGTH => 123,
             ProductsTable::HEIGHT => 123
         ];
-        $ProductsTable = new ProductsTable();
-        $result = $ProductsTable->createProduct($product);
+        $result = $this->ProductsTable->createProduct($product);
         $this->assertArrayHasKey('errors', $result);
         $this->assertEquals(1, count($result['errors']));
         $this->assertEquals([
             ProductsTable::SKU => 'sku already exists'
         ], $result['errors']);
+    }
+
+    public function testCreateProductExistingSkuButInactiveProduct() {
+        $product = [
+            ProductsTable::SKU => 'inactive',
+            ProductsTable::MERCHANT_ID => 99,
+            ProductsTable::DESCRIPTION => 'abc',
+            ProductsTable::UNIT_PRICE => 123,
+            ProductsTable::WEIGHT => 123,
+            ProductsTable::LENGTH => 123,
+            ProductsTable::HEIGHT => 123
+        ];
+        $result = $this->ProductsTable->createProduct($product);
+        $this->assertNotEmpty($result[ProductsTable::ID]);
     }
 
     public function testCreateProductNonUniqueAltSku() {
@@ -91,8 +104,7 @@ ENDQUERY;
             ProductsTable::LENGTH => 123,
             ProductsTable::HEIGHT => 123
         ];
-        $ProductsTable = new ProductsTable();
-        $result = $ProductsTable->createProduct($product);
+        $result = $this->ProductsTable->createProduct($product);
         $this->assertArrayHasKey('errors', $result);
         $this->assertEquals(1, count($result['errors']));
         $this->assertEquals([
@@ -111,8 +123,7 @@ ENDQUERY;
             ProductsTable::LENGTH => 123,
             ProductsTable::HEIGHT => 123
         ];
-        $ProductsTable = new ProductsTable();
-        $product = $ProductsTable->createProduct($product);
+        $product = $this->ProductsTable->createProduct($product);
         $this->assertNotEmpty($product[ProductsTable::ID]);
         // NOTE: this is inconsistent with the update which only
         // returns true/false.
