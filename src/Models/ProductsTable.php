@@ -75,7 +75,7 @@ class ProductsTable {
             // LOG or otherwise handle the error. For a simple
             // find of a given productId, there's no real useful
             // error states to handle.
-            return ['error' => ['db' => 'error getting product']];
+            return ['errors' => ['db' => 'error getting product']];
         }
     }
 
@@ -100,7 +100,7 @@ class ProductsTable {
             // LOG or otherwise handle the error. For a simple
             // find of a the products, there's no real useful
             // error states to handle.
-            return ['error' => ['db' => 'error getting all products']];
+            return ['errors' => ['db' => 'error getting all products']];
         }
     } // returns Product instances
 
@@ -121,6 +121,7 @@ class ProductsTable {
 
         // validate product, return errors if any
         $errors = $this->getValidationErrors($product);
+
         if (!empty($errors)) {
             return ['errors' => $errors];
         }
@@ -153,7 +154,7 @@ ENDQUERY;
                 $product[self::ID] = $this->db->lastInsertId();
                 return $product;
             } else {
-                return ['error' => ['db' => $this->db->errorCode()]];
+                return ['errors' => ['db' => $this->db->errorCode()]];
             }
         } catch (\PDOException $e) {
             return ['errors' => ['db' => $e->getMessage()]];
@@ -207,7 +208,7 @@ ENDQUERY;
             if ($statement->execute($values)) {
                 return $product;
             } else {
-                return ['error' => ['db' => $this->db->errorCode()]];
+                return ['errors' => ['db' => $this->db->errorCode()]];
             }
         } catch (\PDOException $e) {
             return ['errors' => ['db' => $e->getMessage()]];
@@ -238,7 +239,7 @@ ENDQUERY;
                 $product[self::IS_ACTIVE] = 0;
                 return $product;
             } else {
-                return ['error' => ['db' => $this->db->errorCode()]];
+                return ['errors' => ['db' => $this->db->errorCode()]];
             }
         } catch (\PDOException $e) {
             return ['errors' => ['db' => $e->getMessage()]];
@@ -265,10 +266,12 @@ ENDQUERY;
     // Validation Functions
     // Validate CREATE and UPDATE
     public function getValidationErrors($product) {
+
         $errors = [];
 
         // check all required fields
         foreach(self::REQUIRED_FIELDS as $field) {
+
             // first, check if empty
             if (empty($product[$field])) {
                 $errors[$field] = 'required field';
@@ -380,7 +383,7 @@ ENDQUERY;
     }
 
     public static function isPositiveMaxPrecision($number, $maxPrecision) {
-        if ($number < 0) {
+        if ($number < 0 || !is_numeric($number)) {
             // not positive, return
             return false;
         }
