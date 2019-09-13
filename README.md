@@ -18,7 +18,47 @@ Tests can be run from the project root with the command:
 
 The API expects calls to be made as follows:
 ```
-Get all products: /api/products
-Get a single product: /api/product/{$productId}
+Get all products(GET): https://toddberliner.us/shipwire/demo-api/public/api.php/products
+Get a single product (GET): https://toddberliner.us/shipwire/demo-api/public/api.php/products/1
+Create a product (POST): https://toddberliner.us/shipwire/demo-api/public/api.php/products
+Update a product (PUT): https://toddberliner.us/shipwire/demo-api/public/api.php/products/1
+Delete a product (DELETE): https://toddberliner.us/shipwire/demo-api/public/api.php/products/1
 ```
-LEFT OFF HERE...
+
+> Expected Payload for a Product
+```
+For a PUT request, add the "id" property ("id": 1)
+{
+	"product": {
+		"sku": "helloworld",
+		"alt_sku": null,
+		"merchant_id": 1,
+		"description": "hello world!",
+		"unit_price": 1.255555555,
+		"weight": 25.0001,
+		"length": 12.2323,
+		"height": 23.1212,
+		"quantity": 1000
+	}
+}
+```
+
+> CURL Sample
+```
+curl -X POST \
+  https://toddberliner.us/shipwire/demo-api/public/api.php/products \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"product": {
+		"sku": "helloskutodelete",
+		"alt_sku": null,
+		"merchant_id": 1,
+		"description": "hello world!",
+		"unit_price": 1.25,
+		"weight": 25.0001,
+		"length": 12.2323,
+		"height": 23.1212,
+		"quantity": 1000
+	}
+}'
+```
