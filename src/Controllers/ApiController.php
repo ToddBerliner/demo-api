@@ -41,7 +41,7 @@ abstract class ApiController
         http_response_code(201);
         // include location of the new resource
         $newResourceLocation = $this->_buildUriBase() . $resourceId;
-        header($newResourceLocation);
+        header('Location: ' . $newResourceLocation);
         exit;
     }
 

@@ -18,6 +18,16 @@ header("Access-Control-Allow-Methods: GET,POST,PUT,DELETE");
 // and that the path is complete
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uriParts = explode( '/', $uri );
+$endpoint = null;
+$productId = null;
+foreach($uriParts as $idx => $part) {
+    if ($part === 'api' || $part === 'api.php') {
+        $endpoint = $uriParts[$idx + 1];
+        if (isset($uriParts[($idx + 2)])) {
+            $productId = $uriParts[($idx + 2)];
+        }
+    }
+}
 
 function returnInvalidEndpoint() {
     http_response_code(400);
@@ -31,19 +41,15 @@ function returnInvalidEndpoint() {
 }
 
 // Required path parts
-if (!isset($uriParts[2])) {
+if (!isset($endpoint)) {
     returnInvalidEndpoint();
 }
 // Request method
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
 // Simplistic routing
-switch($uriParts[2]) {
+switch($endpoint) {
     case 'products':
-        // check for product id
-        $productId = isset($uriParts[3])
-            ? $uriParts[3]
-            : null;
         $controller = new ProductsController($requestMethod, $productId);
         $controller->processRequest();
         break;
