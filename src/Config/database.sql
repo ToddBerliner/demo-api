@@ -20,11 +20,3 @@ CREATE TABLE `products` (
     UNIQUE `merchant_sku` (`merchant_id`, `sku`), # enforce uniqueness across merchant
     UNIQUE `merchant_altsku` (`merchant_id`, `alt_sku`) # enforce uniqueness across merchant
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-# Seed data for unit tests
-INSERT INTO products
-    (sku, alt_sku, merchant_id, description, unit_price, weight, length, height, is_active, quantity)
-VALUES
-    ('1234567890abcdef', null, 99, 'Test product for unit tests.', 1.99, 0.1234, 1.1111, 1.1111, 1, 10),
-    ('2234567890abcdef', null, 99, 'Test product for unit tests.', 1.99, 0.1234, 1.1111, 1.1111, 1, 10),
-    ('3234567890abcdef', '4234567890abcdef', 99, 'Test product for unit tests.', 1.99, 0.1234, 1.1111, 1.1111, 1, 10);
