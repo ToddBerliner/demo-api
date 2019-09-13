@@ -18,11 +18,11 @@ Tests can be run from the project root with the command:
 
 The API expects calls to be made as follows:
 ```
-Get all products(GET): /api/products
-Get a single product (GET): /api/products/<product_id>
-Create a product (POST): /api/products
-Update a product (PUT): /api/products/<product_id>
-Delete a product (DELETE): /api/products/<product_id>
+Get all products(GET): https://toddberliner.us/shipwire/demo-api/public/api.php/products
+Get a single product (GET): https://toddberliner.us/shipwire/demo-api/public/api.php/products/1
+Create a product (POST): https://toddberliner.us/shipwire/demo-api/public/api.php/products
+Update a product (PUT): https://toddberliner.us/shipwire/demo-api/public/api.php/products/1
+Delete a product (DELETE): https://toddberliner.us/shipwire/demo-api/public/api.php/products/1
 ```
 
 > Expected Payload for a Product
@@ -46,10 +46,11 @@ For a PUT request, add the "id" property ("id": 1)
 > CURL Sample
 ```
 curl -X POST \
-  http://localhost:2323/api/products \
+  https://toddberliner.us/shipwire/demo-api/public/api.php/products \
+  -H 'Content-Type: application/json' \
   -d '{
 	"product": {
-		"sku": "helloworld",
+		"sku": "helloskutodelete",
 		"alt_sku": null,
 		"merchant_id": 1,
 		"description": "hello world!",
@@ -60,3 +61,4 @@ curl -X POST \
 		"quantity": 1000
 	}
 }'
+```
