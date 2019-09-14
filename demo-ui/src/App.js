@@ -2,7 +2,7 @@ import React from 'react';
 import ProductsTable from "./ProductsTable";
 import ProductAdder from "./ProductAdder";
 
-const API = "http://localhost:2323/api/products";
+const API = "https://toddberliner.us/shipwire/demo-api/public/api.php/products";
 
 class App extends React.Component {
 

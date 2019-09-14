@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Feedback from "react-bootstrap/Feedback";
 
-const API = "http://localhost:2323/api/products";
+const API = "https://toddberliner.us/shipwire/demo-api/public/api.php/products";
 
 class ProductAdder extends React.Component {
 
@@ -41,6 +41,7 @@ class ProductAdder extends React.Component {
                 // check for 201 or 204, neither of which return content
                 if (response.status === 201 || response.status === 204) {
                     // call handler that should reload the data
+                    this.setState({errors: {}});
                     form.reset();
                     this.props.productAddedHandler();
                 } else {
