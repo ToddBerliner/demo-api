@@ -1,6 +1,7 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
 
 class ProductsTable extends React.Component {
 
@@ -25,6 +26,7 @@ class ProductsTable extends React.Component {
                     <Table striped bordered hover>
                         <thead>
                         <tr>
+                            <th> </th>
                             <th>ID</th>
                             <th>SKU</th>
                             <th>Alt. SKU</th>
@@ -40,6 +42,11 @@ class ProductsTable extends React.Component {
                         <tbody>
                         {this.state.products.map(product => (
                             <tr key={product.id}>
+                                <td>
+                                    <Button size="sm" onClick={() => this.props.deleteHandler(product.id)}>
+                                        Delete
+                                    </Button>
+                                </td>
                                 <td>{product.id}</td>
                                 <td>{product.sku}</td>
                                 <td>{product.alt_sku}</td>

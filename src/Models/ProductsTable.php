@@ -41,7 +41,8 @@ class ProductsTable {
         self::UNIT_PRICE,
         self::WEIGHT,
         self::LENGTH,
-        self::HEIGHT
+        self::HEIGHT,
+        self::QUANTITY
     ];
 
     public function __construct($test = false) {
