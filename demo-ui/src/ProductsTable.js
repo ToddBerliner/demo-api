@@ -43,7 +43,7 @@ class ProductsTable extends React.Component {
                         {this.state.products.map(product => (
                             <tr key={product.id}>
                                 <td>
-                                    <Button size="sm" onClick={() => this.props.deleteHandler(product.id)}>
+                                    <Button variant="danger" size="sm" onClick={() => this.props.deleteHandler(product.id)}>
                                         Delete
                                     </Button>
                                 </td>

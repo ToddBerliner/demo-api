@@ -6,8 +6,8 @@ import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Feedback from "react-bootstrap/Feedback";
 
-// const API = "https://toddberliner.us/shipwire/demo-api/public/api.php/products";
-const API = "http://localhost:2323/api/products";
+const API = "https://toddberliner.us/shipwire/demo-api/public/api.php/products";
+// const API = "http://localhost:2323/api/products";
 
 class ProductAdder extends React.Component {
 
